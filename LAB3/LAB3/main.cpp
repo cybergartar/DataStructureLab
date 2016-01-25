@@ -29,9 +29,15 @@ void print(node* ptr) {
 }
 
 int getPercent() {
-	int tmp;
-	scanf("%d", &tmp);
-	return tmp;
+	double tmp;
+	scanf("%lf", &tmp);
+	if (tmp < 10)
+		tmp += 10;
+	if (tmp >= 100)
+		tmp = 99;
+	if (tmp < 0)
+		tmp = 10;
+	return (int)tmp;
 }
 
 node* travelWithAmount(int count, node *head) {
@@ -109,11 +115,12 @@ void undo(int *currentStage) {
 		int count = 0;
 		node *h1 = head, *h2 = head->next, *t1 = h1, *t2 = h2;
 		int limit;
+		// printf("EIEI%d\n", opt[*currentStage][1]);
 		if (opt[*currentStage][1] > 5)
 			limit = 10 - opt[*currentStage][1] - 1;
 		else
 			limit = opt[*currentStage][1] - 1;
-		while (count < opt[*currentStage][1] - 1) {
+		while (count < limit) {
 			t1->next = t2->next;
 			t1 = t1->next;
 			t2->next = t1->next;
