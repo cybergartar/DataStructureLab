@@ -63,22 +63,30 @@ void bottomUp(int *currentStage, int percent) {
 }
 
 void riffle(int *currentStage, int percent) {
-	percent = percent / 10;
-	node *h,*now1, *now2, *tmp1, *tmp2, *t1;
-	h = head, t1 = travelWithAmount(percent, h);
-	now1 = h, now2 = t1->next;
-	tmp1 = now1->next, tmp2 = now2->next;
-	do {
-		now1->next = now2;
-		now1 = tmp1;
-		now2->next = tmp1;
-		now2 = tmp2;
-		tmp1 = tmp1->next;
-		tmp2 = tmp2->next;
-	} while (tmp1 != NULL && tmp2 != NULL);
-	opt[*currentStage][0] = 2;
-	opt[*currentStage][1] = percent;
-	(*currentStage)++;
+	percent /= 10;
+	node *h1, *t1, *h2, *t2;
+	h1 = head;
+	t2 = tail;
+	t1 = travelWithAmount(percent, h1);
+	h2 = t1->next;
+	t1->next = NULL;
+	node *now[2], *tmp[2];
+	now[0] = h1, now[1] = h2;
+	tmp[0] = h1->next, tmp[1] = h2->next;
+	int side = 0;
+	while (1) {
+		if (tmp[side] == NULL) {
+			now[side]->next = now[(side + 1) % 2];
+			break;
+		}
+		now[side]->next = now[(side + 1) % 2];
+		now[side] = tmp[side];
+		tmp[side] = tmp[side]->next;
+		side = (side + 1) % 2;
+	}
+	head = h1;
+	tail = (t1 == NULL ? t1 : t2);
+
 	return;
 }
 
