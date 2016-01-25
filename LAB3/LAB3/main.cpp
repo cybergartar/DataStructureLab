@@ -108,39 +108,30 @@ void undo(int *currentStage) {
 	else {
 		int count = 0;
 		node *h1 = head, *h2 = head->next, *t1 = h1, *t2 = h2;
-		if (opt[*currentStage][1] > 5) {
-			while (count < 10 - opt[*currentStage][1] - 1) {
-				t1->next = t2->next;
-				t1 = t1->next;
-				t2->next = t1->next;
-				t2 = t2->next;
-				count++;
-			}
+		int limit;
+		if (opt[*currentStage][1] > 5)
+			limit = 10 - opt[*currentStage][1] - 1;
+		else
+			limit = opt[*currentStage][1] - 1;
+		while (count < opt[*currentStage][1] - 1) {
 			t1->next = t2->next;
-			while (t1->next != NULL) {
-				t1 = t1->next;
-			}
-			t2->next = NULL;
-			t1->next = h2;
-			head = h1;
-			tail = t2;
+			t1 = t1->next;
+			t2->next = t1->next;
+			t2 = t2->next;
+			count++;
 		}
-		else {
-			while (count < opt[*currentStage][1] - 1) {
-				t1->next = t2->next;
+		if (opt[*currentStage][1]>5) {
+			t1->next = t2->next;
+			while (t1->next != NULL)
 				t1 = t1->next;
-				t2->next = t1->next;
-				t2 = t2->next;
-				count++;
-			}
-			while (t2->next != NULL) {
-				t2 = t2->next;
-			}
-			t2->next = NULL;
-			t1->next = h2;
-			head = h1;
-			tail = t2;
 		}
+		else
+			while (t2->next != NULL)
+				t2 = t2->next;
+		t2->next = NULL;
+		t1->next = h2;
+		head = h1;
+		tail = t2;
 
 	}
 	
