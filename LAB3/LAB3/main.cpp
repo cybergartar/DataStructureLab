@@ -86,16 +86,64 @@ void riffle(int *currentStage, int percent) {
 	}
 	head = h1;
 	tail = (t1 == NULL ? t1 : t2);
+	opt[*currentStage][0] = 2;
+	opt[*currentStage][1] = percent;
+	(*currentStage)++;
 
 	return;
 }
 
-void undo() {
-	/*if (!currentStage) {
-		printf("Can't undo anymore!");
+void undo(int *currentStage) {
+	if (!(*currentStage)) {
+		printf("Can't undo anymore!\n");
 		return;
-	}*/
-	//if(currentStage)
+	}
+	(*currentStage)--;
+	// printf("EIEI%d\n", *currentStage);
+	if (opt[*currentStage][0] == 1) {
+		// printf("+++++%d\n", 10 - opt[*currentStage][1]);
+		bottomUp(currentStage, (10-opt[*currentStage][1])*10);
+		(*currentStage)--;
+	}
+	else {
+		int count = 0;
+		node *h1 = head, *h2 = head->next, *t1 = h1, *t2 = h2;
+		if (opt[*currentStage][1] > 5) {
+			while (count < 10 - opt[*currentStage][1] - 1) {
+				t1->next = t2->next;
+				t1 = t1->next;
+				t2->next = t1->next;
+				t2 = t2->next;
+				count++;
+			}
+			t1->next = t2->next;
+			while (t1->next != NULL) {
+				t1 = t1->next;
+			}
+			t2->next = NULL;
+			t1->next = h2;
+			head = h1;
+			tail = t2;
+		}
+		else {
+			while (count < opt[*currentStage][1] - 1) {
+				t1->next = t2->next;
+				t1 = t1->next;
+				t2->next = t1->next;
+				t2 = t2->next;
+				count++;
+			}
+			while (t2->next != NULL) {
+				t2 = t2->next;
+			}
+			t2->next = NULL;
+			t1->next = h2;
+			head = h1;
+			tail = t2;
+		}
+
+	}
+	
 }
 
 int main() {
@@ -117,7 +165,7 @@ int main() {
 		switch (choice) {
 		case 1: percent = getPercent(); bottomUp(&currentStage, percent); print(head);  break;
 		case 2: percent = getPercent(); riffle(&currentStage, percent); print(head); break;
-			case 3: undo(); break;
+			case 3: undo(&currentStage); print(head); break;
 		}
 
 	}
