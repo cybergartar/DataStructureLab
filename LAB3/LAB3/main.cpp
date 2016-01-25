@@ -44,7 +44,7 @@ node* travelWithAmount(int count, node *head) {
 }
 
 void bottomUp(int *currentStage, int percent) {
-	percent = percent/10;
+	percent = percent / 10;
 	node *h1, *h2, *t1, *t2;
 	h1 = head;
 	t2 = tail;
@@ -59,11 +59,27 @@ void bottomUp(int *currentStage, int percent) {
 	//printf("!!!!%d\n", *currentStage);
 	head = h2;
 	tail = t1;
-
+	return;
 }
 
-void riffle() {
-
+void riffle(int *currentStage, int percent) {
+	percent = percent / 10;
+	node *h,*now1, *now2, *tmp1, *tmp2, *t1;
+	h = head, t1 = travelWithAmount(percent, h);
+	now1 = h, now2 = t1->next;
+	tmp1 = now1->next, tmp2 = now2->next;
+	do {
+		now1->next = now2;
+		now1 = tmp1;
+		now2->next = tmp1;
+		now2 = tmp2;
+		tmp1 = tmp1->next;
+		tmp2 = tmp2->next;
+	} while (tmp1 != NULL && tmp2 != NULL);
+	opt[*currentStage][0] = 2;
+	opt[*currentStage][1] = percent;
+	(*currentStage)++;
+	return;
 }
 
 void undo() {
@@ -92,7 +108,7 @@ int main() {
 			return 0;
 		switch (choice) {
 		case 1: percent = getPercent(); bottomUp(&currentStage, percent); print(head);  break;
-			case 2: percent = getPercent(); riffle(); break;
+		case 2: percent = getPercent(); riffle(&currentStage, percent); print(head); break;
 			case 3: undo(); break;
 		}
 
