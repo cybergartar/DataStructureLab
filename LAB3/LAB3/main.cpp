@@ -1,84 +1,81 @@
-#include<cstdio>
-#include<cstdlib>
-#include<cstring>
-using namespace std;
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
 
 struct node {
-	int data;
+	char data[20];
 	node* next;
 };
 
 int opt[1000][2];
 
-node* getNode(int data, node* nextPtr) {
+node* getNode(char *data, node* nextPtr) {
 	node* tmp = (node*)malloc(sizeof(node));
-	tmp->data = data;
+	strcpy(tmp->data, data);
 	tmp->next = nextPtr;
 	return tmp;
 }
 
-node *head, *tail;
-
 void print(node* ptr) {
-	printf("%d ", ptr->data);
-	while (ptr->next != NULL) {
-		ptr = ptr->next;
-		printf("%d ", ptr->data);
-	}
+	printf("\nYOUR STING IS NOW: %s ", ptr->data);
+	for (ptr; ptr->next != NULL; ptr = ptr->next)
+		printf("%s ", ptr->data);
 	printf("\n");
 }
 
-int getPercent() {
-	double tmp;
-	scanf("%lf", &tmp);
-	if (tmp < 10)
-		tmp += 10;
-	if (tmp >= 100)
-		tmp = 99;
-	if (tmp < 0)
-		tmp = 10;
+int getPercentToIndex(int countWord) {
+	double tmp, doubleCountWord = countWord;
+	do
+	{
+		printf("\nPLEASE INPUT PERCENT:");
+		scanf("%lf", &tmp);
+		if (tmp < 0 || tmp>100)
+			printf("INVALID PERCENT!!! PLEASE INPUT AGAIN\n");
+	} while (tmp < 0 || tmp > 100);
+	tmp = (tmp / 100)*doubleCountWord;
 	return (int)tmp;
 }
 
 node* travelWithAmount(int count, node *head) {
-	int cnt = 1;
-	while (cnt != count) {
+	for (int cnt = 1; cnt != count; cnt++)
 		head = head->next;
-		cnt++;
-	}
 	return head;
 }
 
-void bottomUp(int *currentStage, int percent) {
-	percent = percent / 10;
-	node *h1, *h2, *t1, *t2;
-	h1 = head;
-	t2 = tail;
-	t1 = travelWithAmount(percent, h1);
-	h2 = t1->next;
-	t2->next = h1;
-	t1->next = NULL;
-	//printf("%d\n",t1->data);
-	opt[*currentStage][0] = 1;
-	opt[*currentStage][1] = percent;
+void setOperationStack(int mode, int value, int *currentStage) {
+	opt[*currentStage][0] = mode;
+	opt[*currentStage][1] = value;
 	(*currentStage)++;
-	//printf("!!!!%d\n", *currentStage);
-	head = h2;
-	tail = t1;
+}
+
+void bottomUp(int *currentStage, int percent, node **head, node **tail, int countWord) {
+	if (percent == 0 || percent == countWord) {
+		setOperationStack(1, -1, currentStage);
+		return;
+	}
+	node *hNew, *tNew;
+	tNew = travelWithAmount(percent, *head);
+	hNew = tNew->next;
+	(*tail)->next = *head;
+	tNew->next = NULL;
+	setOperationStack(1, percent, currentStage);
+	(*head) = hNew;
+	(*tail) = tNew;
 	return;
 }
 
-void riffle(int *currentStage, int percent) {
-	percent /= 10;
-	node *h1, *t1, *h2, *t2;
-	h1 = head;
-	t2 = tail;
-	t1 = travelWithAmount(percent, h1);
+void riffle(int *currentStage, int percent, node **head, node **tail, int countWord) {
+	if (percent == 0 || percent == countWord) {
+		setOperationStack(2, -1, currentStage);
+		return;
+	}
+	node *t1, *h2, *t2, *now[2], *tmp[2];
+	t2 = *tail;
+	t1 = travelWithAmount(percent, *head);
 	h2 = t1->next;
 	t1->next = NULL;
-	node *now[2], *tmp[2];
-	now[0] = h1, now[1] = h2;
-	tmp[0] = h1->next, tmp[1] = h2->next;
+	now[0] = *head, now[1] = h2;
+	tmp[0] = (*head)->next, tmp[1] = h2->next;
 	int side = 0;
 	while (1) {
 		if (tmp[side] == NULL) {
@@ -90,32 +87,24 @@ void riffle(int *currentStage, int percent) {
 		tmp[side] = tmp[side]->next;
 		side = (side + 1) % 2;
 	}
-	head = h1;
-	tail = (t1 == NULL ? t1 : t2);
-	opt[*currentStage][0] = 2;
-	opt[*currentStage][1] = percent;
-	(*currentStage)++;
-
+	*tail = (t1 == NULL ? t1 : t2);
+	setOperationStack(2, percent, currentStage);
 	return;
 }
 
-void undo(int *currentStage) {
+void undo(int *currentStage, node **head, node **tail, int countWord) {
 	if (!(*currentStage)) {
-		printf("Can't undo anymore!\n");
+		printf("\nCAN'T UNDO ANYMORE!\n");
 		return;
 	}
 	(*currentStage)--;
-	// printf("EIEI%d\n", *currentStage);
-	if (opt[*currentStage][0] == 1) {
-		// printf("+++++%d\n", 10 - opt[*currentStage][1]);
-		bottomUp(currentStage, (10-opt[*currentStage][1])*10);
+	if (opt[*currentStage][0] == 1 && opt[*currentStage][1] != -1) {
+		bottomUp(currentStage, (countWord-opt[*currentStage][1]), head, tail, countWord);
 		(*currentStage)--;
 	}
-	else {
-		int count = 0;
-		node *h1 = head, *h2 = head->next, *t1 = h1, *t2 = h2;
-		int limit;
-		// printf("EIEI%d\n", opt[*currentStage][1]);
+	else if(opt[*currentStage][1] != -1){
+		int count = 0, limit;
+		node *h2 = (*head)->next, *t1 = *head, *t2 = h2;
 		if (opt[*currentStage][1] > 5)
 			limit = 10 - opt[*currentStage][1] - 1;
 		else
@@ -137,35 +126,42 @@ void undo(int *currentStage) {
 				t2 = t2->next;
 		t2->next = NULL;
 		t1->next = h2;
-		head = h1;
-		tail = t2;
-
+		*tail = t2;
 	}
-	
+	print(*head);
 }
 
 int main() {
-	// freopen("inp.in", "r", stdin);
-	// freopen("opt.out", "w", stdout);
-	int currentStage = 0;
-	tail = head = getNode(1, NULL);
-	for (int i = 2; i <= 10; i++) {
-		tail->next = getNode(i, NULL);
+	node *head, *tail;
+	int currentStage = 0, countWord = 0;
+	char inpString[5000], *parsePtr;
+	printf("PLEASE INPUT LETTER STRING: ");
+	gets_s(inpString);
+	parsePtr = strtok(inpString, " ");
+	tail = head = getNode(parsePtr, NULL);
+	countWord++;
+	parsePtr = strtok(NULL, " ");
+	while (parsePtr != NULL) {
+		tail->next = getNode(parsePtr, NULL);
 		tail = tail->next;
+		countWord++;
+		parsePtr = strtok(NULL, " ");
 	}
 	print(head);
 	while (1) {
 		int choice, percent;
-		printf("1: Bottom Up\n2: Riffle\n3: De(Bottom Up/Riffle)\n0: Exit\n");
+		printf("\n1: Bottom Up\n2: Riffle\n3: De(Bottom Up/Riffle)\n0: Exit\n\nPLEASE SELECT CHOICE: ");
 		scanf("%d", &choice);
 		if (!choice)
 			return 0;
 		switch (choice) {
-		case 1: percent = getPercent(); bottomUp(&currentStage, percent); print(head);  break;
-		case 2: percent = getPercent(); riffle(&currentStage, percent); print(head); break;
-			case 3: undo(&currentStage); print(head); break;
+			case 1: percent = getPercentToIndex(countWord); bottomUp(&currentStage, percent, &head, &tail, countWord); print(head);  break;
+			case 2: percent = getPercentToIndex(countWord); riffle(&currentStage, percent, &head, &tail, countWord); print(head); break;
+			case 3: undo(&currentStage, &head, &tail, countWord); break;
+			default: printf("\nINVALID CHOICE!!! PLEASE INPUT AGAIN: ");
 		}
-
+		if (choice >= 1 && choice <= 3)
+			printf("\nYOU HAVE DONE %d ACTION(S)\n", currentStage);
 	}
 
 	return 0;
