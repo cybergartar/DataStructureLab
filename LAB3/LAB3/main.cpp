@@ -17,10 +17,10 @@ node* getNode(char *data, node* nextPtr) {
 }
 
 void print(node* ptr) {
-	printf("\nYOUR STING IS NOW: %s ", ptr->data);
+	printf("\nYOUR STING IS NOW: ");
 	for (ptr; ptr->next != NULL; ptr = ptr->next)
 		printf("%s ", ptr->data);
-	printf("\n");
+	printf("%s\n", ptr->data);
 }
 
 int getPercentToIndex(int countWord) {
