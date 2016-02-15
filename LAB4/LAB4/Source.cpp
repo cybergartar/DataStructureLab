@@ -1,4 +1,4 @@
-#include<stdio.h>
+/*#include<stdio.h>
 #define SIZE 6
 
 typedef int T;
@@ -60,4 +60,4 @@ int main() {
 			printf("pop %d \n", pop(&s));
 		}
 	return 0;
-}
+}*/
