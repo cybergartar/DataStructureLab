@@ -57,33 +57,61 @@ void insertOrder(int data, node **h) {
 		}
 		tmp = tmp->next;
 	}
-	if (tmp->next == NULL) {
+	if (tmp->next == NULL)
 		tmp->next = getNode(data, NULL);
-	}
 	return;
 }
 
 void insertBefore(int data, node **h, int searchVal) {
 	node *tmp;
 	if ((*h)->data == searchVal) {
-		node *tmp = getNode(data, (*h));
+		tmp = getNode(data, (*h));
 		(*h) = tmp;
 		return;
 	}
 	tmp = (*h);
-	while (tmp->next && tmp->next->data != searchVal) {
+	while (tmp->next && tmp->next->data != searchVal) 
 		if (tmp->next)
 			tmp = tmp->next;
 		else
 			break;
-		
-	}
-	if (tmp->next == NULL) {
+
+	if (tmp->next == NULL)
 		tmp->next = getNode(data, NULL);
-	}
 	else {
 		node *tmp2 = getNode(data, tmp->next);
 		tmp->next = tmp2;
+	}
+	return;
+}
+
+void deleteSum(int searchVal, node **h) {
+	int tmpSum = searchVal;
+	node *itte, *befDel, *sttDel, *endDel;
+	itte = befDel = sttDel = endDel = *h;
+	while (itte) {
+		tmpSum -= itte->data;
+		//printf("B++ %p * %d\n", itte, tmpSum);
+		if (!tmpSum) {
+			tmpSum = searchVal;
+			if ((*h) == sttDel) { //@FROM_HEAD
+				//printf("!!!!!(%d * %p)", itte->data, itte);
+ 				befDel = sttDel = (*h) = itte->next;
+				//printf("--- %p\n", (*h));
+			}
+			else {//@MIDDLE
+				befDel->next = endDel->next;
+			}
+		}
+		else if (tmpSum < 0) {
+			befDel = itte;
+			sttDel = itte->next;
+			tmpSum = searchVal;
+		}
+			endDel = itte = itte->next;
+			//printf("AFTER\n BEFDEL:%p STTDEL:%p ITTE:%p HEAD:%p\n", befDel, sttDel, itte,(*h));
+			//printListWithAddress(*h);
+			//getchar();
 	}
 	return;
 }
@@ -107,4 +135,8 @@ int main() {
 	printList(h);
 
 	//----------------3----------------
+	deleteSum(5, &h); printListWithAddress(h);
+	deleteSum(10, &h); printListWithAddress(h);
+	deleteSum(6, &h); printListWithAddress(h);
+	printList(h);
 }
