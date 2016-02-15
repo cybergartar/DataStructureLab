@@ -91,16 +91,13 @@ void deleteSum(int searchVal, node **h) {
 	itte = befDel = sttDel = endDel = *h;
 	while (itte) {
 		tmpSum -= itte->data;
-		//printf("B++ %p * %d\n", itte, tmpSum);
 		if (!tmpSum) {
 			tmpSum = searchVal;
-			if ((*h) == sttDel) { //@FROM_HEAD
-				//printf("!!!!!(%d * %p)", itte->data, itte);
+			if ((*h) == sttDel) //@FROM_HEAD
  				befDel = sttDel = (*h) = itte->next;
-				//printf("--- %p\n", (*h));
-			}
 			else {//@MIDDLE
 				befDel->next = endDel->next;
+				sttDel = befDel->next;
 			}
 		}
 		else if (tmpSum < 0) {
@@ -108,11 +105,24 @@ void deleteSum(int searchVal, node **h) {
 			sttDel = itte->next;
 			tmpSum = searchVal;
 		}
-			endDel = itte = itte->next;
-			//printf("AFTER\n BEFDEL:%p STTDEL:%p ITTE:%p HEAD:%p\n", befDel, sttDel, itte,(*h));
-			//printListWithAddress(*h);
-			//getchar();
+		endDel = itte = itte->next;
 	}
+	return;
+}
+
+void makeReverse(node **h) {
+	node *result;
+	node *origin = *h;
+	int stt = 0;
+	while (origin) {
+		if (stt == 0)
+			result = getNode(origin->data, NULL);
+		else
+			result = getNode(origin->data, result);
+		stt = 1;
+		origin = origin->next;
+	}
+	*h = result;
 	return;
 }
 
@@ -139,4 +149,8 @@ int main() {
 	deleteSum(10, &h); printListWithAddress(h);
 	deleteSum(6, &h); printListWithAddress(h);
 	printList(h);
+
+	//----------------4----------------
+	makeReverse(&h); printList(h);
+	makeReverse(&h); printList(h);
 }
