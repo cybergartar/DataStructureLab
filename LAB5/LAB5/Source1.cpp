@@ -1,4 +1,4 @@
-/*#include<stdio.h>
+#include<stdio.h>
 #include<stdlib.h>
 #define SIZE 5
 
@@ -132,4 +132,4 @@ int main() {
 	print(h2);	printf("\n");
 	printRev(h2);	printf("\n");
 	return 0;
-}*/
+}
